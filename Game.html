@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" content="text/html">
+    <title>DX_Ball</title>
+    <style>
+                .scoreTexts{
+                    float: left;
+                   
+                    
+                }
+                body{
+                    background: black;
+                }
+                h2{
+                color: green;
+                margin-left:20vh;
+                }
+                h1{
+                    color: green;
+                }
+                
+            
+    </style>
+    
+</head>
+<body>
+    
+    <h2>Welcome to Shafkat's DX Ball Game. Navigate your mouse pointer to move the paddle right and left. </h2>
+    
+    <div class = "scoreTexts">
+        <h1 id = "scoreLabel">Score:</h1>
+    </div>
+    <div class = "scoreTexts">
+        <h1 id= "score">  0  </h1>
+    </div>
+  
+    <canvas id="canvas" height="500" width="600" style="margin-left: 40vh"></canvas>
+  
+    <script>
+        var canvas = null,
+        ctx = null,
+        scoreValue = document.getElementById("score");
+        perSecond = 1000/30,
+        ballX = 2, // The Ball's position in X axis
+        ballY = 2, // The Ball's position in Y axis
+        ballXSpeed = 7,
+        ballYSpeed = 9,
+        gameOver = 0,
+        score = 0, 
+        paddleX = 400; //Paddle Position
+
+        const PADDLE_WIDTH = 100;
+        const PADDLE_HEIGHT = 15;
+        // const PADDLE_EDGE = 30;
+        
+        function mousePos (evt) {
+            var rect = canvas.getBoundingClientRect();
+            var root = document.documentElement;
+            var mouseX = evt.clientX - rect.left - root.scrollLeft;
+            
+            paddleX = mouseX;
+            
+        }
+
+
+        window.onload = function() {
+            canvas = document.getElementById("canvas");
+            ctx = canvas.getContext("2d");
+            gameOver = 0;
+            score=0;
+             
+            setInterval(update,perSecond);
+            
+            canvas.addEventListener("mousemove",mousePos);
+            
+        }
+
+        function update () {
+
+            
+            moveAll();
+            drawAll();
+        }
+        
+
+        function moveAll(){
+            ballX += ballXSpeed;
+            ballY += ballYSpeed;
+            if (ballX > canvas.width) {
+                ballXSpeed *= -1; 
+            }
+            if (ballX < 0) {
+                ballXSpeed *= -1;
+            }
+            if (ballY > canvas.height) {
+                //gameOverText.style.display = "block";
+                gameOver = 1;
+                
+                
+            }
+            if (ballY < 0) {
+                ballYSpeed *= -1;
+            }
+            var paddleTopY = canvas.height - PADDLE_HEIGHT;
+            var paddleBottomY = paddleTopY + PADDLE_HEIGHT;
+            var paddleLeftX = paddleX;
+            var paddleRightX = paddleLeftX + PADDLE_WIDTH;
+
+            if (ballY > paddleTopY && ballY < paddleBottomY 
+            && ballX > paddleLeftX && ballX < paddleRightX) {
+               
+                score++;
+                if(score%5===0)
+                {
+                    ballXSpeed+=2.5;
+                    ballYSpeed+=3.5;
+                }
+                scoreValue.textContent = score.toString();
+               // scoreValue.textContent = score.toString();
+                ballYSpeed *= -1;
+            }
+            
+        }
+
+
+        function drawAll () {
+            
+            background("black",0,0,canvas.width,canvas.height);
+            circle("cyan",ballX,ballY,12);
+            paddle("green",paddleX,canvas.height - PADDLE_HEIGHT,PADDLE_WIDTH, PADDLE_HEIGHT);
+        }
+
+
+        function background(color,x,y,width,height)
+        {
+            ctx.fillStyle = color;
+            ctx.lineWidth = "5";
+            ctx.strokeStyle = "green";
+            ctx.fillRect(x,y,width,height);
+            ctx.strokeRect(x,y,width,height);
+            
+            
+            
+            if(gameOver===1)
+              {
+                ctx.font = "30px Comic Sans MS";
+                ctx.fillStyle = "red";
+                ctx.fillText("Game Over! Press Reload To Restart.", (width/2)-250, (height/2));
+                ctx.fillText("Your Score :"+ score.toString(), (width/2)-250, (height/2)+40);
+                
+              }
+        }
+
+        function paddle(color,x,y,width,height)
+        {
+            ctx.fillStyle = color;
+            ctx.fillRect(x,y,width,height);
+            
+        }
+
+        function circle(color,x,y,radius) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x,y,radius,0,Math.PI*2);
+            ctx.fill();
+        }
+        
+    </script>
+</body>
+</html>
